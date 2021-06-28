@@ -1,2 +1,3 @@
 #ignore venv
 venv
+app/__pycache__
