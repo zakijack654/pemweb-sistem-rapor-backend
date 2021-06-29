@@ -30,7 +30,7 @@ class KelasSchema(SQLAlchemySchema):
     id_jurusan = auto_field()
     wali_kelas = auto_field()
 
-class SiswaJoinKelasSchema(SQLAlchemySchema):
+class SiswaGetSchema(SQLAlchemySchema):
     class Meta:
         model = Siswa
         sqla_session = db.session
@@ -65,7 +65,7 @@ def get_post_delete_siswa():
     # GET ALL SISWA
     if request.method == "GET":
         all_siswa = db.session.query(Siswa).join(Kelas).all()
-        schema = SiswaJoinKelasSchema(many=True)
+        schema = SiswaGetSchema(many=True)
         result = schema.dump(all_siswa)
         return make_response(jsonify({"siswa": result}), 201)
     # POST SISWA
@@ -86,7 +86,7 @@ def siswa_by_nis(nis):
     # GET ONE SISWA
     if request.method == "GET":
         get_siswa = db.session.query(Siswa).get(nis)
-        schema = SiswaJoinKelasSchema()
+        schema = SiswaGetSchema()
         result = schema.dump(get_siswa)
         if not result:
             return make_response(jsonify({'error': 'data not found!'}), 404)
