@@ -16,9 +16,23 @@ def get_post_delete_siswa():
     # POST SISWA
     elif request.method == "POST":
         params = request.form
+        # Validate the form
+        if not params.get('nis'):
+            return make_response(jsonify({'error': 'NIS diperlukan!'}), 401)
+        if not params.get('nama_siswa'):
+            return make_response(jsonify({'error': 'Nama diperlukan!'}), 401)
+        if not params.get('email'):
+            return make_response(jsonify({'error': 'Email diperlukan!'}), 401)
+        if not params.get('jenkel'):
+            return make_response(jsonify({'error': 'Jenkel diperlukan!'}), 401)
+        if not params.get('id_kelas'):
+            return make_response(jsonify({'error': 'id_kelas diperlukan!'}), 401)
+        if params.get('jenkel') not in ('L', 'P'):
+            return make_response(jsonify({'error': 'jenis kelamin tidak valid!'}), 401)
         # If siswa already exist, reject request
         if db.session.query(Siswa).get(params['nis']):
             return make_response(jsonify({'error': 'Siswa with this NIS already exist!'}), 401)
+
         schema = SiswaSchema()
         siswa = schema.load(params)
         db.session.add(siswa)
@@ -37,14 +51,14 @@ def siswa_by_nis(nis):
             return make_response(jsonify({'error': 'data not found!'}), 404)
         return make_response(jsonify({'result': result}), 200)
     # UPDATE ONE SISWA
-    if request.method == "PUT":
+    elif request.method == "PUT":
         params = request.form
         print(params)
         get_siswa = db.session.query(Siswa).get(nis)
         # if siswa doesn't exist, reject request
         if get_siswa is None:
             return make_response(jsonify({'error': 'Siswa not found!'}), 404)
-        # Update
+        # Update siswa based on params
         for p in params:
             setattr(get_siswa, p, request.form[p])
         db.session.commit()
