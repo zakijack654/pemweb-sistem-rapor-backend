@@ -15,6 +15,10 @@ def create_app():
     
     # Register blueprints
     from .routes.siswa import siswa
+    from .routes.jurusan import jurusan
+    from .routes.mapel import mapel
     app.register_blueprint(siswa, url_prefix='/api')
+    app.register_blueprint(jurusan, url_prefix='/api')
+    app.register_blueprint(mapel, url_prefix='/api')
 
     return app
