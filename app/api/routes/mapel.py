@@ -29,3 +29,35 @@ def get_post_jurusan():
         # make JSON response
         result = schema.dump(mapel)
         return make_response(jsonify({'message': 'post success', 'data': result}), 201)
+
+@mapel.route('/mapel/<id_mapel>', methods=["GET", "DELETE", "PUT"])
+def mapel_by_id(id_mapel):
+    # GET ONE MAPEL
+    if request.method == "GET":
+        get_mapel = db.session.query(Mapel).get(id_mapel)
+        schema = MapelSchema()
+        result = schema.dump(get_mapel)
+        if not result:
+            return make_response(jsonify({'error': 'data not found!'}), 404)
+        return make_response(jsonify({'result': result}), 200)
+    # UPDATE ONE MAPEL
+    elif request.method == "PUT":
+        params = request.form
+        # if mapel doesn't exist, reject request
+        get_mapel = db.session.query(Mapel).get(id_mapel)
+        if get_mapel is None:
+            return make_response(jsonify({'error': 'Mapel not found!'}), 404)
+        # Update mapel based on params
+        for p in params:
+            setattr(get_mapel, p, request.form[p])
+        db.session.commit()
+        # Create JSON response
+        schema = MapelSchema()
+        result = schema.dump(get_mapel)
+        return make_response(jsonify({'message': 'update successful', 'result': result}), 209)
+    # DELETE ONE MAPEL
+    if request.method == "DELETE":
+        get_mapel = db.session.query(Mapel).get(id_mapel)
+        db.session.delete(get_mapel)
+        db.session.commit()
+        return make_response(jsonify({'message': 'delete successful'}), 204)
